@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Dijkstra Symposium Notes</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <style>
+  :root { --fg:#1f2328; --bg:#ffffff; --muted:#59636e; --rule:#d1d9e0; --code:#f6f8fa; --link:#0969da; }
+  @media (prefers-color-scheme: dark) { :root { --fg:#e6edf3; --bg:#0d1117; --muted:#9198a1; --rule:#3d444d; --code:#161b22; --link:#4493f8; } }
+  html { background: var(--bg); }
+  body { color: var(--fg); background: var(--bg); max-width: 50rem; margin: 0 auto; padding: 2rem 1rem 4rem;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  h1 { font-size: 2rem; line-height: 1.25; border-bottom: 1px solid var(--rule); padding-bottom: .3em; }
+  h2 { font-size: 1.5rem; border-bottom: 1px solid var(--rule); padding-bottom: .3em; margin-top: 2.5rem; }
+  h3 { font-size: 1.25rem; margin-top: 2rem; }
+  h4 { font-size: 1.05rem; margin-top: 1.5rem; }
+  a { color: var(--link); }
+  img { max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 4px; margin: 1rem 0; }
+  pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+  code { background: var(--code); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--code); padding: 1rem; overflow-x: auto; border-radius: 6px; line-height: 1.3; }
+  pre code { background: none; padding: 0; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+  ul { padding-left: 1.5rem; }
+  li { margin: .15rem 0; }
+  .math.display { display: block; overflow-x: auto; margin: 1rem 0; }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<h1
+id="notes-from-dijkstras-retirement-symposium--in-pursuit-of-simplicity">Notes
+from Dijkstra’s Retirement Symposium — “In Pursuit of Simplicity”</h1>
+<p><em>University of Texas at Austin, May 12–13, 2000</em></p>
+<p>While moving recently, I found my notebook containing the notes that
+I took while attending Professor Dijkstra’s Retirement Symposium <em>In
+Pursuit of Simplicity</em>. (Note that one of the speakers and author of
+<a href="https://arxiv.org/pdf/2010.00506">Edsger Dijkstra The Man Who
+Carried Computer Science on His Shoulders</a> Krzysztof R. Apt refers to
+it as a 70th birthday celebration, but I remember it as a retirement
+symposium (and that is what I captured in my notes), so I will continue
+to call it that. The symposium was open to everyone and so, although my
+days as a student were behind me and I was working full time, I took the
+opportunity to meet my heros (or at least see them in person) and attend
+the event. It was a remarkable event.</p>
+<p>I find it interesting to look back at these notes. NOTE: ALL errors
+were introduced by me. A few things stand out to me as especially at
+this time as the profession wrestles with AI coding and the tsunami of
+vulnerabilities.</p>
+<ul>
+<li>Dijkstra: “Can a computer scientist save the computing industry? —
+NO”</li>
+<li>Dijkstra: “Widely spread belief that once we had a sufficiently
+powerful programming language, anyone could program”</li>
+<li>Hoare: “A program and its correctness proof grow hand in hand”</li>
+<li>Dijkstra: [A programs correctness can be asserted by] “Faith or
+proof or exhaustive testing”</li>
+</ul>
+<p>I will lean on R. Dijkstra’s observation “<strong>Lesson: be
+respectful of trivial insights</strong> their lack of depth doesn’t
+reflect on their importance” from the symposium to say that once upon a
+time there was little enough code to conceive of the possibility of
+being able to exhaustively test it all. It has been decades since that
+was the case. If we don’t seize this moment in time to lean on formal
+verification of critical code to stem the tide of today’s AI
+vulnerability apocalypse, then we really never will. And that will be on
+all of us. We have a fresh chance. That means that even though this
+seminar happened so long ago, it is so very timely right now.</p>
+<p>The papers that the talks were based on were gathered and published
+in IPL Volumn 77, Issue 2 <a
+href="https://www.sciencedirect.com/journal/information-processing-letters/vol/77/issue/2">Special
+issue In honor of Edsger W. Dijkstra (Dijkstra)</a> edited by Vicki L.
+Almstrum, David Gries. It is available by subscription only, so I have
+not read it but if you are interested in these topics and have the spare
+cash, I recommend it to you.</p>
+<p>Additional resources on this topic:</p>
+<ul>
+<li><a href="https://arxiv.org/pdf/2104.03392">2021
+Commemoration</a></li>
+<li><a href="https://www.cs.utexas.edu/~EWD/">Dijkstra’s UT
+homepage</a></li>
+</ul>
+<p>I used AI to transcribe my notes from the handwritten scanned images
+into text for your convenience and went back to check the results. In
+some cases, names and titles were corrected versus what I captured based
+on information about the event.</p>
+<hr />
+<h2 id="day-1--may-12-2000">Day 1 — May 12, 2000</h2>
+<!-- page 01 -->
+
+<p><img src="scans/page01.png" alt="Notes, page 1" /></p>
+<h3 id="niklaus-wirth">Niklaus Wirth</h3>
+<ul>
+<li>Oberon — real time subset of StrongARM</li>
+<li>Ongoing project: helicopter simulation, Oct ’94–’99</li>
+<li>Current: full flight autonomy
+<ul>
+<li>follow a preprogrammed path &amp; stabilize</li>
+<li>inherently unstable, like balancing a small ball on a bigger
+ball</li>
+</ul></li>
+<li>Sept ’98: computer controlled hovering</li>
+<li>HW description language: Lola</li>
+<li>Cannot afford mistakes. How do you avoid them? <strong>By pursuing
+simplicity.</strong></li>
+<li>180 cm diameter rotor
+<ul>
+<li>20 kg weight</li>
+</ul></li>
+<li>Data subject to drift, so must make corrections
+<ul>
+<li>one such: asynchronous GPS</li>
+</ul></li>
+<li>New project: commercially available helicopter
+<ul>
+<li>smaller 10 cubic cm engine, 5 kg</li>
+</ul></li>
+<li>2 Intel 486 boards w/ cooling systems for battery</li>
+<li>Made a new one using StrongARM; used 1/5–1/7 power of original</li>
+<li>Remote control manual override</li>
+<li>20×40 cm → 8×13 cm — new design, “Horla”</li>
+<li>Don’t need multiprocessing or task switching
+<ul>
+<li>just need to calculate “attitude”: tilt, pitch, direction</li>
+<li>GPS takes 500 ms–5000 ms, is asynchronous</li>
+</ul></li>
+<li>Has 4 MB because can’t get a smaller chip anymore
+<ul>
+<li>uses 100 KB of memory</li>
+</ul></li>
+<li>HW &amp; SW can be simplified through careful analysis</li>
+<li>Too often rely on black boxes</li>
+<li>We enjoy complex
+<ul>
+<li>1-processor parallelism invalidates realtime constraints</li>
+</ul></li>
+<li>Misunderstanding of interrupt → near fatal crash
+<ul>
+<li>saved by good pilot switching swiftly to manual</li>
+</ul></li>
+<li>Had a real crash of unknown origin; think computer noise interfered
+w/ radio signals</li>
+</ul>
+<!-- page 02 -->
+
+<p><img src="scans/page02.png" alt="Notes, page 2" /></p>
+<h3 id="m-douglas-mcilroy--dartmouth">M. Douglas McIlroy —
+Dartmouth</h3>
+<p><strong>“Up a Lazy River” / Music of Streams</strong></p>
+<ul>
+<li>Met at Formal Language Description Language [conference]</li>
+<li>Power series</li>
+<li>Lazy evaluation</li>
+<li>Haskellian ≈ lazily evaluated, polymorphic, &amp; pattern directed,
+w/ overloaded operators</li>
+<li>Horner form: <span class="math inline">\(f = f_0 +
+z\bar{f}\)</span></li>
+<li>List rep: <span class="math inline">\(f = [f_0, f_1, f_2, f_3,
+\ldots]\)</span></li>
+<li>Cons: <span class="math inline">\(f = f_0 : \bar{f}\)</span></li>
+<li><span class="math inline">\(f(z) = f_0 + f_1 z + f_2 z^2 + f_3 z^3 +
+\cdots\)</span></li>
+<li>Geometric series in Horner form: <code>y = 1:y</code> spews 1’s</li>
+<li><span class="math inline">\((f_0 : \bar{f}) + (g_0 : \bar{g}) = (f_0
++ g_0) : (\bar{f} + \bar{g})\)</span></li>
+<li>Power stream algorithms</li>
+</ul>
+<h3
+id="panel--anish-arora-kenneth-calvert-ambuj-singh-josyula-rao-ibm">Panel
+— Anish Arora, Kenneth Calvert, Ambuj Singh, Josyula Rao (IBM)</h3>
+<p><em>“Loneliness is inevitable”</em></p>
+<h4
+id="ken-calvert--symmetry-simplicity--separation-of-concerns-in-the-internet">Ken
+Calvert — Symmetry, Simplicity &amp; Separation of Concerns in the
+Internet</h4>
+<ul>
+<li>6 min. talklet</li>
+<li>End systems, intermediate systems = routers</li>
+<li>Unicast &amp; multicast channels
+<ul>
+<li>hide multiple hops</li>
+<li>addresses tied to topology</li>
+</ul></li>
+<li>MC (multicast) scalable because state size is determined by topology
+rather than by # of receivers</li>
+<li>Problem: multicast requires feedback</li>
+</ul>
+<pre><code>Transmit:                    Acknowledgement:
+
+         ┌──→ R              R ──┐
+  S ─────┼──→ R              R ──┤
+         ├──→ R              R ──┼──→ S   ← network congestion
+         └──→ R              R ──┘</code></pre>
+<!-- page 03 -->
+
+<p><img src="scans/page03.png" alt="Notes, page 3" /></p>
+<ul>
+<li>Multi-to-One <strong>Concast</strong> Channel
+<ul>
+<li>simple inverse multicast</li>
+</ul></li>
+<li>Most general: user specifies merge computation to be performed on
+intermediate nodes</li>
+<li>Restores symmetry; fixed amount of per-node state</li>
+<li>Easily implemented in hardware</li>
+<li>D quote: <em>“If you have to choose between a beautiful &amp; a
+useful solution, choose beauty, because there are already enough ugly
+useful edifices out there.”</em></li>
+</ul>
+<h4 id="anish-arora--data-refinement">Anish Arora — Data Refinement</h4>
+<ul>
+<li>Monadic data types</li>
+<li>Value level</li>
+<li>Initial proofs</li>
+<li>Partial correctness</li>
+</ul>
+<h4 id="j-r-rao-ibm--formal-methods--security">J. R. Rao (IBM) — Formal
+Methods &amp; Security</h4>
+<ul>
+<li>Ability to withstand attacks
+<ul>
+<li>no way of proving that implementation matches spec</li>
+<li>no formal spec</li>
+</ul></li>
+<li>Cryptographic primitives
+<ul>
+<li>smart card
+<ul>
+<li>secret key stored on smart card</li>
+</ul></li>
+</ul></li>
+<li>Rely on external power supply; by monitoring power supply, can infer
+the key</li>
+<li>Key parity check routine
+<ul>
+<li>for every byte &amp; every bit: is it set?</li>
+<li>get a power glitch on set bits</li>
+</ul></li>
+<li>Easy to protect against</li>
+<li>But new attacks harder to defend against
+<ul>
+<li>implementor must cooperate w/ HW designer to prevent attacks</li>
+</ul></li>
+</ul>
+<!-- page 04 -->
+
+<p><img src="scans/page04.png" alt="Notes, page 4" /></p>
+<h4 id="ambuj-singh--university-of-california-santa-barbara">Ambuj Singh
+— University of California, Santa Barbara</h4>
+<ul>
+<li>Not currently working in formal methods</li>
+<li><strong>Simplicity Matters</strong></li>
+<li>Take Java objects and put them on multiple nodes</li>
+<li>Don’t want end user to know how many or where</li>
+<li>No RMI; all objects are uniform</li>
+<li>Guards support synchronization — no wait/notify</li>
+<li>Transactions to support consistency — no explicit locks</li>
+<li>Network transparency</li>
+<li>Remove unnecessary synchronization — compile-time analysis of heap
+structure; thread-local objects don’t need locks</li>
+<li>Kan compiler → Java bytecode</li>
+<li>Simple programming, simple</li>
+<li>Adaptive systems</li>
+</ul>
+<h3 id="lex-bijlsma--utrecht-university">Lex Bijlsma — Utrecht
+University</h3>
+<p><strong>Model-Based Specification</strong></p>
+<ul>
+<li>OO program derivation
+<ul>
+<li>specification cannot refer to program
+<ul>
+<li>subtype polymorphism</li>
+<li>abstract classes</li>
+</ul></li>
+</ul></li>
+<li>Necessary and possible?
+<ul>
+<li>↳ yes (necessary), because you do not have full access to code</li>
+<li>yes possible, very similar to procedural
+<ul>
+<li>big difference: procedure can refer to program variables</li>
+<li>object methods can’t refer to program variables</li>
+</ul></li>
+<li>in spec, can’t refer to program variables</li>
+</ul></li>
+<li>2 ways around:
+<ul>
+<li>Algebraic specification method
+<ul>
+<li>difficult to apply in practice</li>
+</ul></li>
+<li>Model-based spec method
+<ul>
+<li>link object to entities in problem domain that we know about, i.e.
+mathematics</li>
+</ul></li>
+</ul></li>
+</ul>
+<!-- page 05 -->
+
+<p><img src="scans/page05.png" alt="Notes, page 5" /></p>
+<ul>
+<li>State space is Cartesian product
+<ul>
+<li>not all states may be legal</li>
+</ul></li>
+<li>Model consists of model variables</li>
+<li>Model invariant describes consistent states</li>
+<li>Silently add [it] to precondition and postcondition of every method
+<ul>
+<li>case of reentrancy</li>
+</ul></li>
+<li>Implementation invariant links model variables to class fields</li>
+<li>One model invariant per interface, one implementation invariant per
+implementation</li>
+<li>Not necessarily an abstraction function
+<ul>
+<li>example: Observer pattern</li>
+</ul></li>
+<li>Specification variables
+<ul>
+<li>introduced to relate values of the same variable in 2 different
+states (<span class="math inline">\(x_{old}\)</span>)
+<ul>
+<li>easy case: allow the postcondition to refer to the initial value
+<span class="math inline">\(x_0\)</span></li>
+</ul></li>
+</ul></li>
+<li>Method implementations</li>
+<li>Construct a program fragment <span class="math inline">\(T\)</span>
+over the space spanned by the model <span
+class="math inline">\(a\)</span> and the implementation fields <span
+class="math inline">\(f\)</span> together</li>
+<li>Problem of reentrancy — 3 solutions:
+<ul>
+<li>guarantee no reentrancy</li>
+<li>reestablish model invariant before relinquishing control</li>
+<li>weak invariants: guaranteed to hold at the end, not during or at
+beginning</li>
+</ul></li>
+</ul>
+<h3 id="krzysztof-apt--university-of-amsterdam">Krzysztof Apt —
+University of Amsterdam</h3>
+<p><strong>(Alma-0) How First-Order Logic Can Help Us in Imperative
+Programming</strong></p>
+<ul>
+<li>Downward compatibility w/ underlying programming language</li>
+<li>Extension should be small</li>
+<li>Support declarative language</li>
+<li>Upward compatibility</li>
+<li>9 features added to subset of Modula-2</li>
+</ul>
+<!-- page 06 -->
+
+<p><img src="scans/page06.png" alt="Notes, page 6" /></p>
+<ul>
+<li>Identify Boolean expressions as statements
+<ul>
+<li>test = False → computation fails</li>
+</ul></li>
+<li>Statements as Boolean expressions
+<ul>
+<li>successful computation evaluates to true</li>
+</ul></li>
+<li>Don’t know nondeterminism for failure</li>
+</ul>
+<pre><code>EITHER
+  ...
+ORELSE
+  ...
+ORELSE
+  ...
+END</code></pre>
+<ul>
+<li>If [the first <code>ORELSE</code>] fails, go back and try the next
+<code>ORELSE</code> statement
+<ul>
+<li>failure can occur after <code>END</code> of <code>EITHER</code>
+statement</li>
+<li>if all branches fail, the whole statement fails</li>
+</ul></li>
+<li><code>SOME i := s TO t DO S END</code> — example: linear search</li>
+<li>Generalization of equality
+<ul>
+<li>expressions have a known value if all variables are initialized,
+otherwise unknown</li>
+</ul></li>
+<li>Isabelle — interactive theorem prover
+<ul>
+<li>Nipkow</li>
+</ul></li>
+<li>http://www.cwi.nl/alma</li>
+</ul>
+<h3 id="panel--jim-anderson-k-rustan-m-leino-natarajan-shankar">Panel —
+Jim Anderson, K. Rustan M. Leino, Natarajan Shankar</h3>
+<p><em>(Leino: ↳ Extended Static Checker for Java)</em></p>
+<h4
+id="jim-anderson--wait-free-synchronization-in-real-time-systems">Jim
+Anderson — Wait-Free Synchronization in Real-Time Systems</h4>
+<ul>
+<li>Locking can cause priority inversions</li>
+<li>Mechanisms must be added to the kernel to control priority
+inversions</li>
+<li>Wait-free algorithms cannot cause priority inversions
+<ul>
+<li>wait free: no busy &amp; no passive waiting</li>
+</ul></li>
+<li>Processes scheduled by priority, have deadlines &amp; terminate
+<ul>
+<li>if <span class="math inline">\(p\)</span> preempts <span
+class="math inline">\(q\)</span>, <span class="math inline">\(p\)</span>
+completes before <span class="math inline">\(q\)</span> resumes</li>
+</ul></li>
+<li>Eliminate asynchronous systems</li>
+<li>Must defend against late write</li>
+<li>Warning about intuition leading you astray</li>
+</ul>
+<!-- page 07 -->
+
+<p><img src="scans/page07.png" alt="Notes, page 7" /></p>
+<h4 id="rustan-leino--real-estate-of-names-compaq-src">Rustan Leino —
+Real Estate of Names (Compaq SRC)</h4>
+<ul>
+<li>Undergrad student of Dijkstra</li>
+<li>Simplify &amp; make efficient mathematical argument</li>
+<li>Brute force</li>
+<li>Is that subscript really necessary?</li>
+<li>Putting type into name
+<ul>
+<li>prefix little <code>c</code> for count</li>
+</ul></li>
+<li>Hungarian notation</li>
+<li>Allocate the real estate of names according to importance</li>
+</ul>
+<h4 id="natarajan-shankar-sri--theorem-proving-software">Natarajan
+Shankar (SRI) — Theorem Proving Software</h4>
+<ul>
+<li>Mathematics in parody</li>
+<li><em>Self-Stabilizing Systems in Spite of Distributed Control</em>
+<ul>
+<li>3 solutions → actually 3 new problems</li>
+</ul></li>
+</ul>
+<h3 id="lunch"><em>Lunch</em></h3>
+<h3 id="mani-chandy--caltech">Mani Chandy — Caltech</h3>
+<p><strong>A Theory of Composition Motivated by wp</strong></p>
+<ul>
+<li>Edsger is the world’s best debugging tool</li>
+<li>Systematic ways for designing systems</li>
+<li>Qualitative problems</li>
+<li>Fair execution vs. compositionality
+<ul>
+<li>be restrained in using power</li>
+</ul></li>
+<li>D quote: <em>Can never talk to an American computer scientist
+without him drawing two boxes with an arrow between them.</em></li>
+<li>Monotonic: nondescending ≈ ascending</li>
+</ul>
+<h3 id="fred-schneider--cornell">Fred Schneider — Cornell</h3>
+<ul>
+<li><em>A Logical Approach to Discrete Math</em></li>
+<li><strong>Are There Systems Principles or Only Systems
+Principals?</strong></li>
+<li><em>Structure of the THE OS</em>, Dijkstra ’67</li>
+<li>Principles and artifacts</li>
+<li>Hierarchical system structure, PMV</li>
+</ul>
+<!-- page 08 -->
+
+<p><img src="scans/page08.png" alt="Notes, page 8" /></p>
+<ul>
+<li>Great demos that changed the field</li>
+<li>Artifactual extravaganza — all instantiate common principles
+<ul>
+<li>time multiplexing: processor, communication bus, wire &amp;
+channel</li>
+<li>locality: cache, VM (virtual memory), file system buffers</li>
+<li>atomicity: concurrency, interrupts, transaction management
+protocols</li>
+</ul></li>
+<li>Systems Principles course: <strong>CS GUTS</strong> — Grand Unifying
+Themes
+<ul>
+<li>must appear in diverse settings</li>
+<li>don’t ignore engineering details or artifacts</li>
+</ul></li>
+<li>Hoare: <em>Every system has a program struggling to get
+out</em></li>
+<li>Hacker’s view of computer systems concerns:
+<ul>
+<li>Performance mismatches</li>
+<li>Reality ≈ hostile environments</li>
+<li>Artifact complexity (structure &amp; interface)</li>
+</ul></li>
+<li>Programming methodologist’s view of computer systems concerns:
+<ul>
+<li>need richer semantics for execution</li>
+<li>supporting compositionality</li>
+<li>richer vocabulary of composition</li>
+</ul></li>
+<li><strong>Principle: Time Multiplexing</strong> — yields increased
+utilization, degraded response
+<ul>
+<li>required functionality: save/reload state of resource
+<ul>
+<li>smaller state is better; select next customer for access</li>
+</ul></li>
+<li>multiplexing wire: no state, clock, token, contention</li>
+</ul></li>
+<li><strong>Principle: Parallelism</strong> — increased throughput,
+reduced response time, cost effective
+<ul>
+<li>example: RAID</li>
+</ul></li>
+<li><strong>Principle: Fault Tolerance</strong></li>
+<li><strong>Principle: Security</strong> — not defined what a secure
+system is
+<ul>
+<li>least privilege, complete mediation, separation of privilege,
+failsafe defaults</li>
+<li>understandable TCB increases assurance
+<ul>
+<li>open design; trusted computing base</li>
+</ul></li>
+</ul></li>
+<li>39 50-minute lectures; homework design exercises</li>
+</ul>
+<!-- page 09 -->
+
+<p><img src="scans/page09.png" alt="Notes, page 9" /></p>
+<h3
+id="panel--rajeev-joshi-compaq-99-markus-kaltenbach-96-jacob-kornerup-national-instruments-97-panagiotis-manolios-current-student-co-written-2-books">Panel
+— Rajeev Joshi (Compaq, ’99), Markus Kaltenbach (’96), Jacob Kornerup
+(National Instruments, ’97), Panagiotis Manolios (current student;
+co-written 2 books)</h3>
+<h4
+id="markus-kaltenbach--simplicity-pursued-bringing-formal-verification-to-industrial-design">Markus
+Kaltenbach — Simplicity Pursued: Bringing Formal Verification to
+Industrial Design</h4>
+<ul>
+<li>Verification engines</li>
+<li>Designers want snake oil, no expense</li>
+</ul>
+<h4 id="jacob-kornerup--avoid-subscripts-like-the-plague">Jacob Kornerup
+— Avoid Subscripts Like the Plague</h4>
+<ul>
+<li>Isomorphism: introduce the proper notation</li>
+</ul>
+<h4 id="rajeev-joshi">Rajeev Joshi</h4>
+<ul>
+<li>Studying Commutativity in the context of UNITY (Chandy &amp; Misra
+’88)</li>
+<li>Computation Calculus (Dijkstra ’97)</li>
+<li>How to define commutativity?
+<ul>
+<li>executing them in either order has same effect. That is not the same
+as being the same, because internal state is different</li>
+</ul></li>
+<li>What about infinite computations? <span
+class="math inline">\(\mathit{last}.\sigma = \bot\)</span>
+<ul>
+<li>problem: <span class="math inline">\(\mathit{incx}^\infty \sim
+\mathit{incy}^\infty\)</span> — different temporal properties</li>
+</ul></li>
+<li>Similar (<span class="math inline">\(\simeq\)</span>): have a common
+nonempty prefix and a common nonempty suffix</li>
+</ul>
+<h4
+id="panagiotis-manolios--formal-machine-checkable-proofs-acl2">Panagiotis
+Manolios — Formal Machine-Checkable Proofs (ACL2)</h4>
+<ul>
+<li>Correctness of pipelined machines</li>
+<li>If <span class="math inline">\(\varphi(f)\)</span> is a theorem and
+<span class="math inline">\(g\)</span> satisfies the constraints on
+<span class="math inline">\(f\)</span>, then <span
+class="math inline">\(\varphi(g)\)</span> is a theorem</li>
+<li>Skolem functions: can apply functional abstraction to
+quantification</li>
+</ul>
+<h3 id="rob-hoogerwoord--formality-works">Rob Hoogerwoord — Formality
+Works</h3>
+<ul>
+<li>Turkish proverb: <em>Wisdom is like a comb; most men obtain it only
+when they go bald.</em></li>
+<li>Operations applied to objects</li>
+<li>Operations can be viewed as objects</li>
+<li>Recursion ≈ mathematical induction</li>
+<li>↳ <em>That is shooting a sparrow with a cannon.</em>
+<ul>
+<li>importance of simplicity</li>
+</ul></li>
+<li>Program and specs should be designed concurrently</li>
+<li>Correctness by design — rejected in some quarters</li>
+<li>Loesje: <em>I always think very hard before I say something
+stupid</em></li>
+</ul>
+<!-- page 10 -->
+
+<p><img src="scans/page10.png" alt="Notes, page 10" /></p>
+<ul>
+<li>∓ [?] connecting ≈ neighboring</li>
+<li>Multicast: initially all nodes are white; algorithm exits if all
+nodes are red; there is a root node
+<ul>
+<li>if <span class="math inline">\(x\)</span> has a red neighbor, then
+it turns red</li>
+</ul></li>
+<li>Need to review De Morgan’s Law</li>
+<li>Guarded actions</li>
+<li>Rabbits in proofs?</li>
+<li><em>“If it is clumsy, it’s not mathematics.”</em> — D</li>
+</ul>
+<h3 id="wim-feijen--frolicking-with-formulae">Wim Feijen — Frolicking
+with Formulae</h3>
+<ul>
+<li>Nov. 1, 1970: beginning of collaboration with Dijkstra</li>
+<li>4 Turing Award winners in the audience
+<ul>
+<li><em>Fools rush in where angels fear to tread</em></li>
+</ul></li>
+<li>Random book: GKP ’94 <em>Concrete Mathematics</em>, p. 67, floor
+&amp; ceiling functions
+<ul>
+<li>Galois connected</li>
+</ul></li>
+<li>DS90 <em>Predicate Calculus and Program Semantics</em>, chap. 9
+<ul>
+<li>Main theorem for the repetitive construct</li>
+<li>Extremity property using Knaster/Tarski</li>
+</ul></li>
+<li>Hoare/Dijkstra connection</li>
+<li>3- or 4-line theorem: repetition wp problem — not a good idea
+because it adds problems of termination</li>
+<li><em>“Complexity sells better.”</em> — Dijkstra quote</li>
+</ul>
+<hr />
+<h2 id="day-2--may-13-2000">Day 2 — May 13, 2000</h2>
+<!-- page 11 -->
+
+<p><img src="scans/page11.png" alt="Notes, page 11" /></p>
+<h3
+id="donald-knuth--structured-programming--literate-programming">Donald
+Knuth — Structured Programming &amp; Literate Programming</h3>
+<ul>
+<li>73-371 Stanford technical report</li>
+<li>Series of letters about structured programming</li>
+</ul>
+<h3
+id="panel--don-braben-anne-kaldewaij-martin-rem-netty-van-gasteren">Panel
+— Don Braben, Anne Kaldewaij, Martin Rem, Netty van Gasteren</h3>
+<h4 id="don-braben">Don Braben</h4>
+<ul>
+<li>Not a computer scientist</li>
+<li>In charge of investing to get new technology</li>
+<li>Laser — scientists playing, lucky break, free flow of info</li>
+<li>Talked to hundreds of scientists to ask advice
+<ul>
+<li>wanted to give scientists freedom</li>
+<li>26 groups in 1990</li>
+</ul></li>
+<li>OECD, Angus Maddison
+<ul>
+<li>exploratory research cut back</li>
+<li>GDP growth per capita in ’89 went negative</li>
+<li>only source of long-term growth: science &amp; technology</li>
+</ul></li>
+</ul>
+<h4 id="anne-kaldewaij">Anne Kaldewaij</h4>
+<p><em>(no notes)</em></p>
+<h4 id="martin-rem">Martin Rem</h4>
+<ul>
+<li>Director at Eindhoven; was D’s student</li>
+<li>Time elastic, space inelastic — linear memory
+<ul>
+<li>what would happen if space were elastic? How would you address
+elastic memory?</li>
+<li>want insert/delete at marker to be identity, so markers must point
+between objects; must have left- &amp; right-looking markers</li>
+</ul></li>
+</ul>
+<h4 id="netty-van-gasteren">Netty van Gasteren</h4>
+<ul>
+<li>Professor at Eindhoven</li>
+<li>Alfred North Whitehead</li>
+</ul>
+<h3 id="rutger-dijkstra--drawing-lots-for-sinterklaas">Rutger Dijkstra —
+Drawing Lots for Sinterklaas</h3>
+<ul>
+<li>Went to U. of Köln</li>
+<li><em>Mathematics is the art and science of effective problem
+solving</em></li>
+<li>Son of Dijkstra</li>
+<li>He didn’t shape up his own mathematical act until the mid ’80s</li>
+<li>Combinatorics</li>
+</ul>
+<!-- page 12 -->
+
+<p><img src="scans/page12.png" alt="Notes, page 12" /></p>
+<ul>
+<li>What is the chance of a successful draw? <span
+class="math inline">\(1/e\)</span></li>
+<li>Extract the math. <strong>Lesson: be respectful of trivial
+insights</strong>
+<ul>
+<li>their lack of depth doesn’t reflect on their importance</li>
+</ul></li>
+<li><strong>Lesson: always draw a picture.</strong> // Barrier of
+language? Recurrence relation</li>
+<li><strong>Lesson: let the symbols do the work.</strong> Everywhere
+brackets</li>
+<li>Solving: advanced pattern matching. Basic algebra very rusty</li>
+<li>Classic analysis — Taylor expansion</li>
+</ul>
+<h3
+id="alain-martin--what-i-learned-from-vlsi-an-imaginary-return-to-the-tuesday-afternoon-lunch-club">Alain
+Martin — What I Learned from VLSI: An Imaginary Return to the Tuesday
+Afternoon Lunch Club</h3>
+<ul>
+<li>Concentrating on 1 point; met D. in 1971</li>
+<li>Programs are instances of mechanisms</li>
+<li><em>Toward an Energy Complexity of Computation</em></li>
+<li>Intel: ISP building started filling with 1U boxes, stopped halfway
+<ul>
+<li>not enough power in power grid to feed the building</li>
+<li>time and space replaced by time and energy concerns</li>
+</ul></li>
+<li>Energy — expensive, destructive, inconvenient</li>
+<li>Asynchronous VLSI is energy efficient
+<ul>
+<li>no clocks, no energy consumed at idle, adjustable parameters</li>
+</ul></li>
+<li>Potato battery</li>
+<li>Irreversible computations = previous value is destroyed</li>
+<li><span class="math inline">\(E \cdot t\)</span> is the wrong metric;
+<span class="math inline">\(E \cdot t^2\)</span> is correct (energy,
+time)</li>
+<li>Is pipelining efficient w.r.t. energy and time?
+<ul>
+<li><span class="math inline">\(\Theta_0 = E \cdot t^2 \cdot
+(1+k)^3\)</span> [?]</li>
+</ul></li>
+<li>All stages of pipeline have same cycle time
+<ul>
+<li>but all stages don’t have to consume same energy</li>
+<li><span class="math inline">\(E_p = (\Sigma j : 0..n-1 : E_j) \qquad
+t_p = t_j\)</span></li>
+<li><span class="math inline">\(t_p\)</span>: cycle time for computation
+of one <span class="math inline">\(f(x)\)</span></li>
+<li>one result for every revolution</li>
+<li><span class="math inline">\(E_p = E + k \cdot n \cdot E\)</span> [?]
+<span class="math inline">\(\qquad t_p = t/n + k \cdot t\)</span></li>
+</ul></li>
+</ul>
+<!-- page 13 -->
+
+<p><img src="scans/page13.png" alt="Notes, page 13" /></p>
+<ul>
+<li>Ideal pipeline: <span
+class="math inline">\(\dfrac{\Theta_p}{\Theta_0} = \dfrac{1}{n^2} \qquad
+E_p = E \qquad t_p = t/n\)</span>
+<ul>
+<li>up to <span class="math inline">\(n^2\)</span> energy gain because
+of time savings</li>
+</ul></li>
+<li>Optimal depth of pipeline = 2
+<ul>
+<li>worst case depends on width of data</li>
+<li><span class="math inline">\(E_p = 3E \qquad t_p = \tfrac{3}{2} \cdot
+k \cdot t\)</span> — optimal case</li>
+</ul></li>
+<li>Performance of pipeline is very sensitive to overhead ratio
+<ul>
+<li>if overhead is equal to function computing, it is not worth it</li>
+</ul></li>
+<li><strong>Conclusion: method is more important than
+information</strong></li>
+<li>Energy is mostly proportional to area — <span
+class="math inline">\(A \cdot t^2\)</span> analogy intriguing</li>
+<li><em>“All progress is made by unreasonable people.”</em> — D</li>
+<li>Single capacitor</li>
+</ul>
+<h3 id="panel--ted-herman-91-charanjit-jutla-ibm-david-naumann-92">Panel
+— Ted Herman (’91), Charanjit Jutla (IBM), David Naumann (’92)</h3>
+<h4 id="ted-herman--distributed-computing">Ted Herman — Distributed
+Computing</h4>
+<ul>
+<li>Robustness: keep track of deepest leaf — can eliminate heap
+requirement from proof about heap deleting least value from heap</li>
+</ul>
+<h4
+id="charanjit-jutla--confidentiality-and-authentication-using-block-ciphers">Charanjit
+Jutla — Confidentiality and Authentication Using Block Ciphers</h4>
+<ul>
+<li>Undergraduate at IIT in India</li>
+<li><span class="math inline">\(n\)</span> bit → <span
+class="math inline">\(n\)</span> bit, symmetric
+<ul>
+<li>can’t prove this is secure under strict definition of secure</li>
+</ul></li>
+<li>Cipher block chaining mode
+<ul>
+<li>invertible; maintains secrecy of <span class="math inline">\(\langle
+P_0, P_1, \ldots, P_{m-1} \rangle\)</span></li>
+<li>if someone gets ciphertext, negligible gain over random
+guessing</li>
+<li>receiver can’t tell w/o key whether ciphertext has been
+corrupted</li>
+</ul></li>
+<li>MAC — message authentication code: one block output rather than
+ciphertext</li>
+<li><strong>One pass to do both!</strong>
+<ul>
+<li>integrity check: <span class="math inline">\(P_0 \oplus P_1 \oplus
+\cdots \oplus P_m = 0\)</span></li>
+</ul></li>
+<li>Pairwise independent random numbers as additional input
+<ul>
+<li>minimum required to ensure security and authentication</li>
+</ul></li>
+</ul>
+<!-- page 14 -->
+
+<p><img src="scans/page14.png" alt="Notes, page 14" /></p>
+<h4 id="david-naumann--deriving-sharp-adaptation-rules">David Naumann —
+Deriving Sharp Adaptation Rules</h4>
+<ul>
+<li>Pre- and postcondition rely on auxiliary variable</li>
+<li>What is weakest precondition?</li>
+</ul>
+<p><span class="math display">\[\{a \le x \le a+1\}\ S\ \{y = a \lor y =
+a+1\}\]</span></p>
+<p><span class="math display">\[\{\,?\,\}\ S\ \{y = 0\}\]</span></p>
+<ul>
+<li>3 solutions in literature
+<ul>
+<li>plus several more not sound</li>
+</ul></li>
+<li>Range diffusion: EWD1201</li>
+</ul>
+<h3 id="c-a-r-hoare-ms--legacy">C. A. R. Hoare (MS) — Legacy</h3>
+<ul>
+<li>Has been knighted by Queen Elizabeth</li>
+<li>Spring 1961: Algol 60 course, first meeting; they don’t remember
+this meeting</li>
+<li>WG2.1: what features</li>
+<li><em>“Declarations give us our only hope that a computer can protect
+us against our own programming errors”</em></li>
+<li>Redundancy leads to readability</li>
+<li><em>“A programming language is a tool that has a profound influence
+on our thinking”</em></li>
+<li><em>“A prisoner falls in love with his chains”</em></li>
+<li>Consideration of program w/ <em>process</em>: correctness is driving
+force</li>
+<li>A program and its correctness proof grow hand in hand</li>
+<li>Avoid operational reasoning like the plague</li>
+<li>Task of a scientist is to develop understanding to enable other
+people to change the world, not to change the world himself</li>
+<li>To give opinions about applications is to destroy objectivity &amp;
+integrity
+<ul>
+<li>should be investigated apart from their application</li>
+</ul></li>
+<li>Task of a scientist is not to plan the future but to prepare for
+it</li>
+<li>Legacy: it is always difficult and no mean feat to change the tyres
+of a moving vehicle</li>
+</ul>
+<!-- page 15 -->
+
+<p><img src="scans/page15.png" alt="Notes, page 15" /></p>
+<ul>
+<li>Design your program as a member of a family that includes all its
+later versions</li>
+<li>Nothing is as expensive as making mistakes</li>
+<li><em>“I pray daily that more of my fellow computer scientists may
+free themselves from the curse of compatibility”</em>
+<ul>
+<li><em>(margin: legacy is an engineering problem)</em></li>
+</ul></li>
+<li>If you visualize that I am looking over your shoulder…
+<ul>
+<li>Edsger, may you live forever.</li>
+</ul></li>
+<li>Needham — devil’s machine; Dijkstra — God’s machine
+<ul>
+<li>big benefit in having everyone on site</li>
+</ul></li>
+</ul>
+<h3 id="greg-nelson--juno-2-a-constraint-based-graphics-system">Greg
+Nelson — Juno-2, a Constraint-Based Graphics System</h3>
+<ul>
+<li>Compaq lab by Bob Taylor? w/ Allan Heydon</li>
+<li>A scientist has to be courageous — he did a demo</li>
+<li>Weakest precondition</li>
+<li>Almost always, geometric constraints have multiple solutions. Hints
+narrow it down.</li>
+<li>Drawing diamonds and flow chart</li>
+<li>Used GNOME &amp; Linux as platform for Juno-2 demo</li>
+<li>Procedure calls; program writes itself</li>
+<li>Add constraints ~</li>
+<li>Available in source and binary; written in Modula-3
+<ul>
+<li>well documented, 20,000 lines of easy reading</li>
+</ul></li>
+</ul>
+<!-- page 16 -->
+
+<p><img src="scans/page16.png" alt="Notes, page 16" /></p>
+<h3 id="edsger-w-dijkstras-farewell-lecture">Edsger W. Dijkstra’s
+Farewell Lecture</h3>
+<ul>
+<li>Formal university dress</li>
+<li>If you have unrealistic expectations, you will be disappointed</li>
+<li>½ century of change</li>
+<li>Grew up during occupation</li>
+<li>Delta Works: unique sense of purpose; never needed to wonder what to
+do next — luxury</li>
+<li>Distinction between pure and applied science vanished</li>
+<li>Article of faith: what is useful is beautiful</li>
+<li>Elegance is a matter of life &amp; death; major factor in
+choice</li>
+<li>Obsession with application: wedge between theory &amp; practice</li>
+<li>Applied science tends to become 2nd-rate theory</li>
+<li>Man’s predicament is to plan for tomorrow in yesterday’s
+language</li>
+<li>Major shift: power, role of money, and intellectual quality</li>
+<li>Free not to try to become rich — choose between family &amp;
+car</li>
+<li>Difficult to attract PhD students; undergrads dropping out</li>
+<li>Can a computer scientist save the computing industry? — NO</li>
+<li>General loss of respect for each other</li>
+<li>Students are seen as part of the problem; textbooks and lecture
+techniques are so condescending as to be offensive
+<ul>
+<li>just as students are supposed to live on junk food, [they are]
+supposed to thrive on junk science</li>
+</ul></li>
+<li><em>“No one can write decently who is distrustful…”</em> — Strunk
+&amp; White</li>
+<li>Programming represented a greater challenge than theoretical
+physics</li>
+<li><strong>Algol 60 marked the birth of computer science</strong>
+<ul>
+<li>BNF: formal grammar to define syntax</li>
+<li>block structure: local variables, lexicographic scope, nested
+lifetime</li>
+<li>recursion: firm place in imperative programming
+<ul>
+<li>Fortran “too fancy for real programming language”</li>
+</ul></li>
+<li>boolean as first-class citizen
+<ul>
+<li>expect boolean to be adopted into mathematics</li>
+<li>1854 introduced, but not accepted into math</li>
+</ul></li>
+</ul></li>
+</ul>
+<!-- page 17 -->
+
+<p><img src="scans/page17.png" alt="Notes, page 17" /></p>
+<ul>
+<li>Pigeonhole problem
+<ul>
+<li>in boolean logic they mean the same thing</li>
+<li>pictorial depiction blurs the distinction</li>
+</ul></li>
+<li>Machine independence (Algol’s 5th novelty)
+<ul>
+<li>Purliss judged Algol 60 (not good enough) — wouldn’t run on IBM</li>
+</ul></li>
+<li>Returned language implementation into academic world
+<ul>
+<li>8 months, 3 man-year Algol implementation</li>
+</ul></li>
+<li>Could be so complicated as to become intellectually unmanageable,
+untrustworthy</li>
+<li>Faith or proof or exhaustive testing
+<ul>
+<li>faith: blech</li>
+<li>exhaustive testing: impossible</li>
+<li>proof: only one left</li>
+</ul></li>
+<li>Message has not been forgotten
+<ul>
+<li>book containing both documents still in print
+<ul>
+<li>4 copies sold</li>
+</ul></li>
+</ul></li>
+<li>Clerical skills, like surgeon’s precautions in operating room
+<ul>
+<li>was viewed as painful but simple low-level task</li>
+</ul></li>
+<li>Widely spread belief that once we had a sufficiently powerful
+programming language, anyone could program</li>
+<li>Honored for contribution to programming languages, to which I
+contributed nothing</li>
+<li>“Deskilling of the programmer”</li>
+<li>“The Average Programmer,” “The Casual User”</li>
+<li><em>Mathematics of Programming</em> Computing 1987</li>
+<li>Gospel of design by derivation
+<ul>
+<li>Feijen &amp; Martin have done him proud</li>
+</ul></li>
+<li>Burroughs: 11 years doing his own thing; change of CEO</li>
+<li>Mathematical interests widen; ready to return to campus — UT</li>
+<li>Meaningless belly [?] of symbols was not my cup of tea</li>
+</ul>
+<!-- page 18 -->
+
+<p><img src="scans/page18.png" alt="Notes, page 18" /></p>
+<ul>
+<li>Developed calculational style of mathematics</li>
+<li>Lacked mathematical background</li>
+<li>Noun-oriented picture number (Greeks): triangular numbers <span
+class="math inline">\(0, 1, 3, 6, 10, \ldots\)</span></li>
+<li>Shift of <em>what</em> → <em>how</em>: art &amp; science of
+effective reasoning</li>
+<li>Leibniz, Bell: symbols would direct reasoning</li>
+<li>Hilbert: a proof is something that convinces other mathematicians
+<ul>
+<li>rigor in proof is not enemy of simplicity; symbols’ simplicity
+directs reasoning</li>
+<li>vs. world of math continues as if these things were never said</li>
+<li>a passionate plea against using formal mathematical reasoning</li>
+</ul></li>
+<li>Hilbert has been ignored</li>
+<li>Acquired taste, but a taste worth acquiring</li>
+<li>Proof as a sufficient sketch for a formal argument</li>
+<li>Formal systems: compilers &amp; theorem provers
+<ul>
+<li>tools for mechanical assistance</li>
+</ul></li>
+<li>CS became Leibniz’s home</li>
+<li><em>The Taming of Complexity</em> — Bremen, BP grant</li>
+<li>Don’t introduce complexity in the first place</li>
+<li>Clear blue sky of Texas</li>
+<li><strong>Y’all come back!</strong></li>
+</ul>
+</body>
+</html>
